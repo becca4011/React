@@ -1,14 +1,17 @@
-import logo from './logo.svg';
+import React, { Component } from 'react';
+import TOC from "./components/TOC"; // 컴포넌트를 파일로 쪼갠 후, 가져옴
+import Content from "./components/Content";
+import Subject from "./components/Subject";
 import './App.css'; // App 컴포넌트의 css
-import { Component } from 'react';
 
-// class type
+// App 컴포넌트를 root 태그 안에 넣음
 class App extends Component {
   render() {
     return (
-      // 반드시 이 태그 안쪽에 나머지 태그들이 있어야 함 (지우면 error)
       <div className="App">
-        Hello, React
+        <Subject title="WEB" sub="world wide web!"></Subject>
+        <TOC></TOC>
+        <Content title="HTML" desc="HTML is HyperText Markup Language."></Content>
       </div>
     );
   }
