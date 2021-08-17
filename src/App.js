@@ -11,21 +11,36 @@ class App extends Component {
     super(props); // state 값 초기화
     // state : 앱 내부적으로 사용할 때 state 사용 (props의 값을 바꿀 수 있음)
     this.state = {
-      subject: { title: "WEB", sub: "World Wide Web!" },
+      // mode를 변경(welcome, read) → 링크 아래쪽의 글이 변경
+      mode: 'welcome',
+      subject: { title: 'WEB', sub: 'World Wide Web!' },
+      welcome: { title: 'Welcome', desc: 'Hello, React!!' },
       contents: [
-        { id: 1, title: "HTML", desc: "HTML is for information" },
-        { id: 2, title: "CSS", desc: "CSS is for design" },
-        { id: 3, title: "JavaScript", desc: "JavaScript is for interactive" }
+        { id: 1, title: 'HTML', desc: 'HTML is for information' },
+        { id: 2, title: 'CSS', desc: 'CSS is for design' },
+        { id: 3, title: 'JavaScript', desc: 'JavaScript is for interactive' }
       ]
     }
   }
 
+  // render() : 어떤 HTML을 그릴 것인지 정함 (props나 state가 변경되면 화면이 다시 그려짐 → render() 호출)
   render() {
+    var _title, _desc = null;
+    if (this.state.mode === 'welcome') {
+      _title = this.state.welcome.title;
+      _desc = this.state.welcome.desc;
+    }
+    else if (this.state.mode === 'read') {
+      _title = this.state.contents[0].title;
+      _desc = this.state.contents[0].desc;
+    }
+
     return (
+      // 각각의 render() 함수를 호출함 (App → Subject → TOC → Content 순으로 호출)
       <div className="App">
         <Subject title={this.state.subject.title} sub={this.state.subject.sub}></Subject>
         <TOC data={this.state.contents}></TOC>
-        <Content title="HTML" desc="HTML is HyperText Markup Language."></Content>
+        <Content title={_title} desc={_desc}></Content>
       </div>
     );
   }
