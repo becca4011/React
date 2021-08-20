@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import TOC from "./components/TOC"; // 컴포넌트를 파일로 쪼갠 후, 가져옴
-import Content from "./components/Content";
+import ReadContent from "./components/ReadContent";
+import CreateContent from "./components/CreateContent";
 import Subject from "./components/Subject";
+import Control from "./components/Control";
 import './App.css'; // App 컴포넌트의 css
 
 // App 컴포넌트를 root 태그 안에 넣음
@@ -9,10 +11,11 @@ class App extends Component {
   // render보다 먼저 실행, 컴포넌트를 초기화시키고 싶을 때 사용
   constructor(props) {
     super(props); // state 값 초기화
+    this.max_content_id = 3;
     // state : 앱 내부적으로 사용할 때 state 사용 (props의 값을 바꿀 수 있음)
     this.state = {
       // mode를 변경(welcome, read) → 링크 아래쪽의 글이 변경
-      mode: 'read',
+      mode: 'create',
       selected_content_id: 2,
       subject: { title: 'WEB', sub: 'World Wide Web!' },
       welcome: { title: 'Welcome', desc: 'Hello, React!!' },
@@ -26,11 +29,12 @@ class App extends Component {
 
   // render() : 어떤 HTML을 그릴 것인지 정함 (props나 state가 변경되면 화면이 다시 그려짐 → render() 호출)
   render() {
-    var _title, _desc = null;
+    var _title, _desc, _article = null;
     // WEB 글씨를 클릭한 경우
     if (this.state.mode === 'welcome') {
       _title = this.state.welcome.title;
       _desc = this.state.welcome.desc;
+      _article = <ReadContent title={_title} desc={_desc}></ReadContent>
     }
 
     // HTML, CSS, JavaScript 글씨를 클릭한 경우
@@ -47,6 +51,25 @@ class App extends Component {
         }
         i = i + 1;
       }
+      _article = <ReadContent title={_title} desc={_desc}></ReadContent>
+    }
+
+    else if (this.state.mode === 'create') {
+      // 컴포넌트를 이렇게 변경할 수도 있음
+      _article = <CreateContent onSubmit={function (_title, _desc) {
+        // 새로운 content 추가
+        this.max_content_id = this.max_content_id + 1;
+        var _contents = this.state.contents.concat(
+          { id: this.max_content_id, title: _title, desc: _desc }
+        )
+        // push : 원본을 바꿈 / concat : 원본을 바꾸지 않음 (기존 배열 + 추가한 값이 들어간 새로운 배열을 만듦)
+        // this.state.contents.push(
+        //   { id: this.max_content_id, title: _title, desc: _desc }
+        // );
+        this.setState({
+          contents: this.state.contents
+        })
+      }.bind(this)}></CreateContent>
     }
 
     return (
@@ -74,14 +97,19 @@ class App extends Component {
             this.setState({
               mode: 'read',
               selected_content_id: Number(id)
-              // 글씨를 클릭한 경우 모드를 read로 바꾸고, 해당 글씨의 id 전달
+              // 글씨를 클릭한 경우 모드를 read로 바꾸고, 해당 글씨의 id 전달 (event)
             });
           }.bind(this)}
-          data={this.state.contents}
-        >
+          data={this.state.contents}>
         </TOC>
 
-        <Content title={_title} desc={_desc}></Content>
+        <Control onChangeMode={function (_mode) {
+          this.setState({
+            mode: _mode
+          })
+        }.bind(this)}></Control>
+
+        {_article}
       </div>
     );
   }
