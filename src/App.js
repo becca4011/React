@@ -59,16 +59,19 @@ class App extends Component {
       _article = <CreateContent onSubmit={function (_title, _desc) {
         // 새로운 content 추가
         this.max_content_id = this.max_content_id + 1;
-        var _contents = this.state.contents.concat(
-          { id: this.max_content_id, title: _title, desc: _desc }
-        )
-        // push : 원본을 바꿈 / concat : 원본을 바꾸지 않음 (기존 배열 + 추가한 값이 들어간 새로운 배열을 만듦)
-        // this.state.contents.push(
+        // var _contents = this.state.contents.concat(
         //   { id: this.max_content_id, title: _title, desc: _desc }
-        // );
+        // )
+        var newContents = Array.from(this.state.contents);
+        newContents.push({ id: this.max_content_id, title: _title, desc: _desc });
+
+        // push : 원본을 바꿈 
+        // concat : 원본을 바꾸지 않고 복제 (기존 배열 + 추가한 값이 들어간 새로운 배열을 만듦 / immutable)
+        // Array.from() & push : 원본을 바꾸지 않고 복제 (객체 변경 : Array.assign() / 배열 변경 : Array.from())
+
         this.setState({
-          contents: this.state.contents
-        })
+          contents: newContents // _contents
+        });
       }.bind(this)}></CreateContent>
     }
 
