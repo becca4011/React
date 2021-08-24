@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import TOC from "./components/TOC"; // 컴포넌트를 파일로 쪼갠 후, 가져옴
 import ReadContent from "./components/ReadContent";
 import CreateContent from "./components/CreateContent";
+import UpdateContent from "./components/UpdateContent";
 import Subject from "./components/Subject";
 import Control from "./components/Control";
 import './App.css'; // App 컴포넌트의 css
@@ -27,8 +28,20 @@ class App extends Component {
     }
   }
 
-  // render() : 어떤 HTML을 그릴 것인지 정함 (props나 state가 변경되면 화면이 다시 그려짐 → render() 호출)
-  render() {
+  getReadContent() {
+    var i = 0;
+    while (i < this.state.contents.length) {
+      var data = this.state.contents[i];
+      // contents의 id와 클릭한 글씨의 id가 같은 경우
+      if (data.id === this.state.selected_content_id) {
+        // 그에 대한 타이틀과 설명을 넘김 (Content에서 띄워줌)
+        return data;
+      }
+      i = i + 1;
+    }
+  }
+
+  getContent() {
     var _title, _desc, _article = null;
     // WEB 글씨를 클릭한 경우
     if (this.state.mode === 'welcome') {
@@ -39,19 +52,8 @@ class App extends Component {
 
     // HTML, CSS, JavaScript 글씨를 클릭한 경우
     else if (this.state.mode === 'read') {
-      var i = 0;
-      while (i < this.state.contents.length) {
-        var data = this.state.contents[i];
-        // contents의 id와 클릭한 글씨의 id가 같은 경우
-        if (data.id === this.state.selected_content_id) {
-          // 그에 대한 타이틀과 설명을 넘김 (Content에서 띄워줌)
-          _title = data.title;
-          _desc = data.desc;
-          break;
-        }
-        i = i + 1;
-      }
-      _article = <ReadContent title={_title} desc={_desc}></ReadContent>
+      var _content = this.getReadContent();
+      _article = <ReadContent title={_content.title} desc={_content.desc}></ReadContent>
     }
 
     else if (this.state.mode === 'create') {
@@ -70,11 +72,37 @@ class App extends Component {
         // Array.from() & push : 원본을 바꾸지 않고 복제 (객체 변경 : Array.assign() / 배열 변경 : Array.from())
 
         this.setState({
-          contents: newContents // _contents
+          contents: newContents, // _contents
+          mode: 'read',
+          selected_content_id: this.max_content_id
         });
       }.bind(this)}></CreateContent>
     }
 
+    else if (this.state.mode === 'update') {
+      _content = this.getReadContent();
+      _article = <UpdateContent data={_content} onSubmit={function (_id, _title, _desc) {
+        var newContents = Array.from(this.state.contents);
+        var i = 0;
+        while (i < newContents.length) {
+          if (newContents[i].id === _id) {
+            newContents[i] = { id: _id, title: _title, desc: _desc };
+            break;
+          }
+          i = i + 1;
+        }
+
+        this.setState({
+          contents: newContents,
+          mode: 'read'
+        });
+      }.bind(this)}></UpdateContent>
+    }
+    return _article;
+  }
+
+  // render() : 어떤 HTML을 그릴 것인지 정함 (props나 state가 변경되면 화면이 다시 그려짐 → render() 호출)
+  render() {
     return (
       // 각각의 render() 함수를 호출함 (App → Subject → TOC → Content 순으로 호출)
       <div className="App">
@@ -112,7 +140,7 @@ class App extends Component {
           })
         }.bind(this)}></Control>
 
-        {_article}
+        {this.getContent()}
       </div>
     );
   }
