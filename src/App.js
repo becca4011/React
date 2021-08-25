@@ -16,7 +16,7 @@ class App extends Component {
     // state : 앱 내부적으로 사용할 때 state 사용 (props의 값을 바꿀 수 있음)
     this.state = {
       // mode를 변경(welcome, read) → 링크 아래쪽의 글이 변경
-      mode: 'create',
+      mode: 'welcome',
       selected_content_id: 2,
       subject: { title: 'WEB', sub: 'World Wide Web!' },
       welcome: { title: 'Welcome', desc: 'Hello, React!!' },
@@ -135,9 +135,30 @@ class App extends Component {
         </TOC>
 
         <Control onChangeMode={function (_mode) {
-          this.setState({
-            mode: _mode
-          })
+          if (_mode === 'delete') {
+            // window.confirm : 확인 / 취소가 있는 창 (확인 : true / 취소 : false)
+            if (window.confirm('really?')) {
+              var newContents = Array.from(this.state.contents);
+              var i = 0;
+              while (i < newContents.length) {
+                if (newContents[i].id === this.state.selected_content_id) {
+                  newContents.splice(i, 1); // id부터 1개를 지움
+                  break;
+                }
+                i = i + 1;
+              }
+              this.setState({
+                mode: 'welcome',
+                contents: newContents
+              });
+              alert('deleted!');
+            }
+          }
+          else {
+            this.setState({
+              mode: _mode
+            })
+          }
         }.bind(this)}></Control>
 
         {this.getContent()}
